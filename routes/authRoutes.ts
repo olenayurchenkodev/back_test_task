@@ -23,13 +23,14 @@ router.post(`/register`,
             })
         }
         const {username, email, password, isAdmin} = req.body
+        console.log('datas', username, email, password, isAdmin)
         const candidate = await User.findOne({email})
         if (candidate){
             res.status(400).json({message: "Already have this user"})
         }
         const hashPass = await bcrypt.hash(password, 12)
         const user = new User({username, email, password: hashPass, isAdmin})
-
+        console.log("User ", user)
         await user.save()
         res.status(201).json({message:"User registered"})
         console.log("User registered")
@@ -69,7 +70,7 @@ router.post(`/login`,
         const token = jwt.sign(
             {userId: user.id},
             "some secret string",
-            {expiresIn: '1h'}
+            {expiresIn: '30d'}
         )
 
         res.json({token, userId: user.id})

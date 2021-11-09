@@ -15,6 +15,7 @@ app.use(cors(corsOptions));
 app.use(express.json())
 
 app.use('/auth', require('./routes/authRoutes'))
+app.use('/profile', require('./routes/profileRoutes'))
 
 const start = async () =>{
     try{
