@@ -16,6 +16,7 @@ app.use(express.json())
 
 app.use('/auth', require('./routes/authRoutes'))
 app.use('/profile', require('./routes/profileRoutes'))
+app.use('/users', require('./routes/userRoutes'))
 
 const start = async () =>{
     try{

@@ -1,10 +1,17 @@
 import express = require('express')
+const auth = require('../middleware/auth.middleware')
 const bcrypt = require(`bcrypt`)
 const {Router} = require(`express`)
 const jwt = require(`jsonwebtoken`)
 const {check, validationResult} = require(`express-validator`)
 const User = require(`../models/User`)
 const router = Router()
+
+declare module "express" {
+    export interface Request {
+        user: any
+    }
+}
 
 // /auth/registration
 router.post(`/register`,
@@ -23,14 +30,13 @@ router.post(`/register`,
             })
         }
         const {username, email, password, isAdmin} = req.body
-        console.log('datas', username, email, password, isAdmin)
+        console.log('admin status', isAdmin)
         const candidate = await User.findOne({email})
         if (candidate){
             res.status(400).json({message: "Already have this user"})
         }
         const hashPass = await bcrypt.hash(password, 12)
         const user = new User({username, email, password: hashPass, isAdmin})
-        console.log("User ", user)
         await user.save()
         res.status(201).json({message:"User registered"})
         console.log("User registered")
@@ -55,6 +61,7 @@ router.post(`/login`,
                 message: "Incorrect data log"
             })
         }
+        // console.log('request to server for user', req.body)
         const {email, password} = req.body
         const user = await User.findOne({ email })
 
@@ -72,8 +79,22 @@ router.post(`/login`,
             "some secret string",
             {expiresIn: '30d'}
         )
+        const isAdmin = user.isAdmin
+        // console.log('from db',isAdmin)
 
-        res.json({token, userId: user.id})
+        res.json({token, userId: user.id, isAdmin})
+
+    } catch (e){
+        res.status(500).json("smth wrong")
+    }
+})
+
+router.get('/home', auth, async (req: express.Request, res: express.Response) => {
+    try{
+        // console.log("in function",req.user.userId)
+        const user = await User.findOne({_id: req.user.userId})
+        // console.log(user)
+        res.json(user.username)
 
     } catch (e){
         res.status(500).json("smth wrong")

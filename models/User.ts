@@ -5,7 +5,7 @@ const schema = new Schema({
     email: {type: String, required: true, unique: true},
     password: {type: String, required: true},
     isAdmin: {type: String},
-    profiles: [{type: Types.ObjectId, ref: 'Profile'}]
+    profileNum: {type: Number, default: 0}
 })
 
 module.exports = model('User', schema)
