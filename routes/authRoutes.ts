@@ -21,7 +21,7 @@ router.post(`/register`,
     ],
     async (req: express.Request, res: express.Response)=>{
     try{
-        console.log(req.body)
+        //validation check
         const errors = validationResult(req)
         if(!errors.isEmpty()){
             return res.status(400).json({
@@ -30,7 +30,8 @@ router.post(`/register`,
             })
         }
         const {username, email, password, isAdmin} = req.body
-        console.log('admin status', isAdmin)
+
+        //looking for existing email, hash password and save user
         const candidate = await User.findOne({email})
         if (candidate){
             res.status(400).json({message: "Already have this user"})
@@ -38,8 +39,8 @@ router.post(`/register`,
         const hashPass = await bcrypt.hash(password, 12)
         const user = new User({username, email, password: hashPass, isAdmin})
         await user.save()
+
         res.status(201).json({message:"User registered"})
-        console.log("User registered")
 
     } catch (e){
         res.status(500).json("smth wrong")
@@ -54,6 +55,7 @@ router.post(`/login`,
     ],
     async (req: express.Request, res: express.Response)=>{
     try{
+        //validation check
         const errors = validationResult(req)
         if(!errors.isEmpty()){
             return res.status(400).json({
@@ -61,26 +63,23 @@ router.post(`/login`,
                 message: "Incorrect data log"
             })
         }
-        // console.log('request to server for user', req.body)
         const {email, password} = req.body
-        const user = await User.findOne({ email })
 
+        // looking for user by email, compare password and generate token
+        const user = await User.findOne({ email })
         if(!user){
             return res.status(400).json({message: "User not defined"})
         }
         const isMatch = await bcrypt.compare(password, user.password)
-
         if(!isMatch){
             res.status(500).json({message: "incorrect password, try again"})
         }
-
         const token = jwt.sign(
             {userId: user.id},
             "some secret string",
             {expiresIn: '30d'}
         )
         const isAdmin = user.isAdmin
-        // console.log('from db',isAdmin)
 
         res.json({token, userId: user.id, isAdmin})
 
@@ -89,16 +88,17 @@ router.post(`/login`,
     }
 })
 
+// /auth/home
 router.get('/home', auth, async (req: express.Request, res: express.Response) => {
     try{
-        // console.log("in function",req.user.userId)
+        //looking for user by id
         const user = await User.findOne({_id: req.user.userId})
-        // console.log(user)
-        res.json(user.username)
+        if (user){ res.json(user.username) }
 
     } catch (e){
         res.status(500).json("smth wrong")
     }
 })
+
 
 module.exports = router

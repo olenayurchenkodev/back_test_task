@@ -2,22 +2,22 @@ import express = require('express')
 const mongoose = require(`mongoose`)
 const PORT = process.env.PORT || 3001
 const cors = require('cors');
-const server = express();
 
 const app = express()
 const corsOptions ={
     origin:'http://localhost:3000',
-    credentials:true,            //access-control-allow-credentials:true
+    credentials:true,
     optionSuccessStatus:200
 }
 app.use(cors(corsOptions));
-
 app.use(express.json())
 
+// basic routes
 app.use('/auth', require('./routes/authRoutes'))
 app.use('/profile', require('./routes/profileRoutes'))
 app.use('/users', require('./routes/userRoutes'))
 
+// start function
 const start = async () =>{
     try{
         await mongoose.connect(`mongodb+srv://olenayurchenkodev:ITop1000OY@cluster0.odlic.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`)

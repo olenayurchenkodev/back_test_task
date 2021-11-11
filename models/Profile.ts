@@ -1,6 +1,7 @@
 export {};
 let {Schema, model, Types} = require(`mongoose`)
 
+// Profile schema
 const profile = new Schema({
     name: {type: String, required: true},
     gender: {type: String},
