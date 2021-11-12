@@ -40,6 +40,18 @@ router.post('/update', auth,
     }
 })
 
+// /users/search
+router.get('/:id', auth,  async (req: express.Request, res: express.Response) => {
+    try{
+        // find all users not admins
+        const user = await User.findOne({_id: req.params.id})
+        res.json(user)
+
+    } catch (e){
+        res.status(500).json("smth wrong")
+    }
+})
+
 // /users/
 router.delete('/', auth, async (req: express.Request, res: express.Response)=>{
     try{
@@ -71,20 +83,5 @@ router.get('/', auth,  async (req: express.Request, res: express.Response) => {
         res.status(500).json("smth wrong")
     }
 })
-
-// /users/
-router.get('/statistic', auth,  async (req: express.Request, res: express.Response) => {
-    try{
-        // find all users for statistic
-        const users = await User.find()
-
-        if (users){
-            res.json(users)
-        }
-    } catch (e){
-        res.status(500).json("smth wrong")
-    }
-})
-
 
 module.exports = router
