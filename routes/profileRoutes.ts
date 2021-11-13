@@ -31,12 +31,30 @@ router.post('/generate', auth, async (req: express.Request, res: express.Respons
     }
 })
 
+router.put('/update', auth,
+    async (req: express.Request, res: express.Response) => {
+        try{
+            const {profile_id, name, gender, birthdate, city} = req.body
+            //looking for existing email, hash password and save user
+            const profile = await Profile.findOneAndUpdate({_id: profile_id},
+                { name: name, gender: gender, birthdate: birthdate, city: city},
+                {new: true});
+
+            if (profile) {
+                res.status(201).json({message:"Profile updated"})
+            }
+        } catch (e){
+            res.status(500).json("smth wrong")
+        }
+    })
+
 // /profile/
 router.delete('/', auth, async (req: express.Request, res: express.Response)=>{
     try{
         // delete profile
-        const profile = await Profile.findOne({_id: req.body.key})
-        await Profile.deleteOne({_id: req.body.key})
+        const {profile_id} = req.body
+        const profile = await Profile.findOne({_id: profile_id})
+        await Profile.deleteOne({_id: profile_id})
         // decrement counter in user
         const user = await User.findOne({_id: profile.owner})
         await User.findOneAndUpdate({_id: user._id}, { profileNum: user.profileNum-1}, {new: true});
@@ -52,8 +70,19 @@ router.delete('/', auth, async (req: express.Request, res: express.Response)=>{
 router.get('/', auth,  async (req: express.Request, res: express.Response) => {
     try{
         // get all profiles of user
-        const profiles = await Profile.find({owner: req.user.userId})
+        const profiles = await Profile.find()
+        console.log(profiles)
+        res.json(profiles)
 
+    } catch (e){
+        res.status(500).json("smth wrong")
+    }
+})
+
+router.get('/:id', auth,  async (req: express.Request, res: express.Response) => {
+    try{
+        // find all users not admins
+        const profiles = await Profile.find({_id: req.params.id})
         res.json(profiles)
 
     } catch (e){

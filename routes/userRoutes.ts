@@ -21,11 +21,12 @@ router.post('/update', auth,
                 message: "Incorrect data"
             })
         }
+        console.log(req.body)
         const {id, username, email, isAdmin} = req.body
 
         //looking for existing email, hash password and save user
         const candidate = await User.findOne({email})
-        if (candidate){
+        if (candidate._id != id){
             res.status(400).json({message: "Already have this user"})
         }
         const user = await User.findOneAndUpdate({_id: id},
