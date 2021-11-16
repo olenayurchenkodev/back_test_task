@@ -19,4 +19,15 @@ router.get('/', auth,  async (req: express.Request, res: express.Response) => {
     }
 })
 
+router.get('/:id', auth,  async (req: express.Request, res: express.Response) => {
+    try{
+        // get all profiles of user
+        const profiles = await Profile.find({owner: req.params.id})
+        res.json(profiles)
+
+    } catch (e){
+        res.status(500).json("smth wrong")
+    }
+})
+
 module.exports = router

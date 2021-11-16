@@ -22,12 +22,14 @@ app.use('/statistic', require('./routes/statistic'))
 const start = async () =>{
     try{
         await mongoose.connect(`mongodb+srv://olenayurchenkodev:ITop1000OY@cluster0.odlic.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`)
-        app.listen(PORT, ()=>console.log(`server started on port ${PORT}`))
+        app.listen(PORT, ()=>console.log(`server started on port ${port}`))
     }
     catch (e: any){
         console.log(e.message)
         process.exit(1)
     }
 }
+
+const port = 3001
 
 start()

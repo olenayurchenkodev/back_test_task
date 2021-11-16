@@ -94,8 +94,9 @@ router.get('/:id', auth,  async (req: express.Request, res: express.Response) =>
 router.get('/:id', auth,  async (req: express.Request, res: express.Response) => {
     try{
         // get all profiles of user
+        console.log(req.params.id)
         const profiles = await Profile.find({owner: req.params.id})
-
+        console.log(profiles)
         res.json(profiles)
 
     } catch (e){
